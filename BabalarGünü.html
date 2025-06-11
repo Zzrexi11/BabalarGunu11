@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Babalar Günü</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom, #ffcccc, #ffe6e6);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Poppins', sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .heart-container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      animation: glow 2s ease-in-out infinite;
+      z-index: 1;
+    }
+
+    .heart {
+      width: 180px;
+      height: 180px;
+      background: red;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-45deg);
+      animation: beat 1s infinite;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
+    }
+
+    .heart::before,
+    .heart::after {
+      content: "";
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      background: red;
+      border-radius: 50%;
+    }
+
+    .heart::before {
+      top: -90px;
+      left: 0;
+    }
+
+    .heart::after {
+      left: 90px;
+      top: 0;
+    }
+
+    .text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 600;
+      opacity: 0;
+      animation: fadeIn 2s ease-in-out 1s forwards;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      z-index: 2;
+      line-height: 1.5;
+    }
+
+    @keyframes beat {
+      0%, 100% {
+        transform: translate(-50%, -50%) rotate(-45deg) scale(1);
+      }
+      50% {
+        transform: translate(-50%, -50%) rotate(-45deg) scale(1.1);
+      }
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes glow {
+      0%, 100% {
+        filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.5));
+      }
+      50% {
+        filter: drop-shadow(0 0 25px rgba(255, 0, 0, 0.9));
+      }
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+
+  <div class="heart-container">
+    <div class="heart"></div>
+    <div class="text">İyi ki varsın<br>Babam 💖</div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("confetti");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    const confetti = [];
+    const colors = ["#ff3b3f", "#ff8c00", "#ffe600", "#32cd32", "#1e90ff", "#ba55d3"];
+
+    function createPiece() {
+      return {
+        x: Math.random() * canvas.width,
+        y: Math.random() * -canvas.height,
+        r: Math.random() * 6 + 4,
+        d: Math.random() * 10 + 5,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        tilt: Math.floor(Math.random() * 10) - 5,
+        tiltAngle: 0,
+        tiltAngleIncrement: Math.random() * 0.1 + 0.05
+      };
+    }
+
+    for (let i = 0; i < 200; i++) {
+      confetti.push(createPiece());
+    }
+
+    function drawConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let c of confetti) {
+        ctx.beginPath();
+        ctx.lineWidth = c.r;
+        ctx.strokeStyle = c.color;
+        ctx.moveTo(c.x + c.tilt + c.r / 2, c.y);
+        ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r);
+        ctx.stroke();
+      }
+      updateConfetti();
+      requestAnimationFrame(drawConfetti);
+    }
+
+    function updateConfetti() {
+      for (let c of confetti) {
+        c.tiltAngle += c.tiltAngleIncrement;
+        c.y += (Math.cos(c.d) + 3 + c.r / 2) / 2;
+        c.tilt = Math.sin(c.tiltAngle) * 15;
+        if (c.y > canvas.height) {
+          c.y = -10;
+          c.x = Math.random() * canvas.width;
+        }
+      }
+    }
+
+    drawConfetti();
+  </script>
+</body>
+</html>
